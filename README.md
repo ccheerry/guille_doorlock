@@ -1,6 +1,6 @@
 # guille_doorlock
 A simple resource to create in-game doorlocks.
-Any problem feel free to ask in the guillerp discord, I will be pleasured to help you
+Any problem feel free to ask in the guillerp discord, I will be pleasured to help you, You can also feel free to contact my DMs (CherryozZ#5357)
 
 ### [Discord](https://discord.gg/eBpmkW6e5j)
 
