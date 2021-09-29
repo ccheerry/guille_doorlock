@@ -5,6 +5,6 @@ Config['enableNuiIndicator'] = true
 Config['scriptVersion'] = 1.0
 
 Config["strings"] = {
-    ['open'] = "Press ~g~E~w~ to open the door",
-    ['close'] = "Press ~g~E~w~ to close the door",
+    ['open'] = "Press ~b~E~w~ to ~g~open~w~ the door",
+    ['close'] = "Press ~b~E~w~ to ~r~close~w~ the door",
 }
