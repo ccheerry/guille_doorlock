@@ -231,42 +231,7 @@ end
 
 https://github.com/CherryozZ/qb-wrapper
 
-7) Modify your qb-core/fxmanifest.lua to
-
-```lua
-fx_version 'cerulean'
-game 'gta5'
-
-description 'QB-Core'
-version '1.0.0'
-
-shared_scripts { 
-	'import.lua',
-	'config.lua',
-	'shared.lua'
-}
-
-client_scripts {
-	'client/*.lua'
-}
-
-server_scripts {
-	'server/*.lua'
-}
-
-ui_page {
-	'html/ui.html'
-}
-
-lua54 'yes'
-
-files {
-	'html/ui.html',
-	'html/css/*.css',
-	'html/js/*.js'
-}
-```
-
+7) Add the wrapper files in qb-core/fxmanifest.lua 
 
 8) Start your server.
 
