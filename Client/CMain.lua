@@ -24,7 +24,7 @@ _CreateThread(function()
     end)
 end)
 
-QBCore['Functions']['ShowHelpNotification'] = function(msg, thisFrame, beep, duration)
+function QBCore['Functions']['ShowHelpNotification'](msg, thisFrame, beep, duration)
 	AddTextEntry('qbHelpNotification', msg)
 
 	if thisFrame then
