@@ -1,7 +1,7 @@
 local _doorCache = {}
 local _CreateThread, _RegisterServerEvent = CreateThread, RegisterServerEvent
 
-QBCore = QBCore
+QBCore = exports['qb-core']:GetCoreObject()
 
 isAllowed = function(source)
     local Perms = QBCore.Functions.GetPermission(source)
