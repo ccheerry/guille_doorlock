@@ -9,7 +9,6 @@ description 'guille_doorlock converted to QBCore by CherryozZ#5357'
 lua54 'yes'
 
 shared_scripts {
-    '@qb-core/import.lua',
     'Shared/Config.lua'
 }
 
