@@ -11,7 +11,7 @@ local text = ""
 
 TriggerEvent("chat:addSuggestion", "/door", ("Add a door"), {})
 
-QBCore = QBCore
+QBCore = exports['qb-core']:GetCoreObject()
 
 local _doorType, _distToDoor, allowedJobs, doorPin = "normal", 2, {}, ""
 
