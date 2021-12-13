@@ -13,18 +13,17 @@ TriggerEvent("chat:addSuggestion", "/door", ("Add a door"), {})
 
 QBCore = exports['qb-core']:GetCoreObject()
 
-local _doorType, _distToDoor, allowedJobs, doorPin = "normal", 2, {}, ""
+local _doorType, _distToDoor, allowedJobs, doorPin, item = "normal", 2, {}, "", ""
 
 _CreateThread(function()
     _Wait(500)
     QBCore['Functions']['TriggerCallback']('guille_doorlock:cb:getDoors', function(doors, state)
         _enabledDoors = doors
         _doorState = state
-        print(json.encode(state))
     end)
 end)
 
-function QBCore['Functions']['ShowHelpNotification'](msg, thisFrame, beep, duration)
+function QBCore.Functions.ShowHelpNotification(msg, thisFrame, beep, duration)
 	AddTextEntry('qbHelpNotification', msg)
 
 	if thisFrame then
@@ -42,6 +41,7 @@ RegisterNetEvent("guille_doorlock:client:setUpDoor", function()
     table['insert'](elements, {label = "Distance to door: " .._distToDoor, value = "doordist"})
     table['insert'](elements, {label = "Add job", value = "addjob"})
     table['insert'](elements, {label = "Add pin: " ..doorPin, value = "doorpin"})
+    table['insert'](elements, {label = "Add item: " ..item, value = "dooritem"})
     for k, v in pairs(allowedJobs) do
         table['insert'](elements, {label = v, value = k})
     end
@@ -108,7 +108,7 @@ RegisterNetEvent("guille_doorlock:client:setUpDoor", function()
                 ExecuteCommand("door")
             end)
         elseif v == "conf" then
-            addDoor(_doorType, _distToDoor, allowedJobs, doorPin)
+            addDoor(_doorType, _distToDoor, allowedJobs, doorPin, item)
             QBCore['UI']['Menu']['CloseAll']()
             _doorType = "normal"
             _distToDoor = 2
@@ -123,6 +123,23 @@ RegisterNetEvent("guille_doorlock:client:setUpDoor", function()
                     QBCore['Functions']['Notify']('Invalid pin, try again')
                 else
                     doorPin = pin
+                    QBCore['UI']['Menu']['CloseAll']()
+                    ExecuteCommand("door")
+                end
+            end, function(data2, menu2)
+                menu2['close']()
+                QBCore['UI']['Menu']['CloseAll']()
+                ExecuteCommand("door")
+            end)
+        elseif v == "dooritem" then
+            QBCore['UI']['Menu']['Open']('dialog', GetCurrentResourceName(), 'new_jobitem', {
+                title = 'Introduce the door item'
+            }, function(data2, menu2)
+                local pin = data2['value']
+                if pin == nil then
+                    QBCore['Functions']['Notify']('Invalid item, try again')
+                else
+                    item = pin
                     QBCore['UI']['Menu']['CloseAll']()
                     ExecuteCommand("door")
                 end
@@ -201,7 +218,7 @@ AddEventHandler("onResourceStop", function(resource)
     end
 end)
 
-addDoor = function(type, dist, jobs, pin)
+addDoor = function(type, dist, jobs, pin, item)
     dist = tonumber(dist)
     if not dist then
         dist = 2
@@ -225,7 +242,7 @@ addDoor = function(type, dist, jobs, pin)
                         local _doorModel = GetEntityModel(entity)
                         local _heading = GetEntityHeading(entity)
                         local _textCoords = coords
-                        TriggerServerEvent("guille_doorlock:server:addDoor", _doorCoords, _doorModel, _heading, type, _textCoords, dist, jobs, pin)
+                        TriggerServerEvent("guille_doorlock:server:addDoor", _doorCoords, _doorModel, _heading, type, _textCoords, dist, jobs, pin, item)
                         SetEntityDrawOutline(entity, false)
                         break
                     end
@@ -252,10 +269,10 @@ addDoor = function(type, dist, jobs, pin)
                         SetEntityDrawOutline(v, true)
                     end
                     if #_doorsDobule ~= 2 then
-                        DrawLine(_coords, coords, 0, 0, 0, 255)
+                        DrawLine(_coords, coords, 0, 255, 34, 255)
                         QBCore['Functions']['ShowHelpNotification']("Press ~INPUT_CONTEXT~ to add a door")
                     else
-                        DrawLine(_coords, coords, 0, 0, 0, 255)
+                        DrawLine(_coords, coords, 0, 255, 34, 255)
                         QBCore['Functions']['ShowHelpNotification']("Press ~INPUT_CONTEXT~ to confirm and point to the coords where the text will be added (important)")
                     end
                     showedEntity = entity
@@ -288,7 +305,7 @@ RegisterNetEvent("guille_doorlock:client:refreshDoors", function(tableToIns)
     table['insert'](_enabledDoors, tableToIns)
 end)
 
-local _selectedDoorJobs, pin = {}, nil
+local _selectedDoorJobs, pin, object = {}, nil, nil
 
 _CreateThread(function()
     while true do
@@ -319,6 +336,11 @@ _CreateThread(function()
                         pin = v['pin']
                     else
                         pin = nil
+                    end
+                    if v['useitem'] then
+                        object = v['item']
+                    else
+                        object = nil
                     end
                     if _doorState[k] ~= nil then
                         text = Config["strings"]['close']
@@ -365,6 +387,11 @@ _CreateThread(function()
                             pin = v['pin']
                         else
                             pin = nil
+                        end
+                        if v['useitem'] then
+                            object = v['item']
+                        else
+                            object = nil
                         end
                         _selectedDoorJobs = v['jobs']
                         if _doorState[k] ~= nil then
@@ -515,6 +542,14 @@ RegisterCommand("lockdoor", function()
                     menu2['close']()
                     QBCore['UI']['Menu']['CloseAll']()
                 end)
+            end
+            if object then
+                QBCore['Functions']['TriggerCallback']('guille_doorlock:cb:hasObj', function(has)
+                    if has then
+                        pulsed = true
+                        object = nil
+                    end
+                end, object)
             end
         end
     end

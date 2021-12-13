@@ -2,7 +2,7 @@ Config = {} or Config
 
 Config['enableNuiIndicator'] = true
 
-Config['scriptVersion'] = 1.0
+Config['scriptVersion'] = 1.1
 
 Config["strings"] = {
     ['open'] = "Press ~b~E~w~ to ~g~open~w~ the door",

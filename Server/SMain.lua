@@ -3,12 +3,13 @@ local _CreateThread, _RegisterServerEvent = CreateThread, RegisterServerEvent
 
 QBCore = exports['qb-core']:GetCoreObject()
 
-isAllowed = function(source)
-    local Perms = QBCore.Functions.GetPermission(source)
-    if Perms == "admin" or Perms == "god" then
-    return true
-end
-return false
+function isAllowed(source)
+    local _src <const> = source
+    local Perms = QBCore.Functions.GetPermission(_src)
+      if Perms == "admin" or Perms == "god" then
+         return true
+      end
+  return false
 end
 
 _CreateThread(function()
@@ -26,6 +27,10 @@ _CreateThread(function()
             print(name .. " has skipped the latest version ^2" .. latestVersion .. ". Either Github is offline or the version file has been changed")
         else
             print(name .. " is updated.")
+            print(name.. [[
+                Update 1.1:
+                - Now you can unlock a door with an item!
+            ]])
         end
     end
 
@@ -38,13 +43,17 @@ QBCore['Functions']['CreateCallback']('guille_doorlock:cb:getDoors', function(so
     cb(doors, _doorCache)
 end)
 
-_RegisterServerEvent("guille_doorlock:server:addDoor", function(_doorCoords, _doorModel, _heading, type, _textCoords, dist, jobs, pin)
+_RegisterServerEvent("guille_doorlock:server:addDoor", function(_doorCoords, _doorModel, _heading, type, _textCoords, dist, jobs, pin, item)
     local _src <const> = source
     if isAllowed(_src) then
         local usePin = false
+        local useitem = false
         local doors = LoadResourceFile(GetCurrentResourceName(), "Server/Files/Doors.json")
         if pin ~= "" then
             usePin = true
+        end
+        if item ~= "" then
+            useitem = true
         end
         doors = json.decode(doors)
         local tableToIns <const> = {
@@ -57,6 +66,8 @@ _RegisterServerEvent("guille_doorlock:server:addDoor", function(_doorCoords, _do
             jobs = jobs,
             usePin = usePin,
             pin = pin,
+            useitem = useitem,
+            item = item
         }
         table['insert'](doors, tableToIns)
         SaveResourceFile(GetCurrentResourceName(), "Server/Files/Doors.json", json['encode'](doors), -1)
@@ -99,7 +110,7 @@ _RegisterServerEvent("guille_doorlock:server:syncRemove", function(id)
         local doors = LoadResourceFile(GetCurrentResourceName(), "Server/Files/Doors.json")
         doors = json.decode(doors)
         table['remove'](doors, id)
-        SaveResourceFile(GetCurrentResourceName(), "Server/Files/Doors.json", json['encode'](doors), -1)
+        SaveResourceFile(GetCurrentResourceName(), "Server/Files/Doors.json", json['encode'](doors, { indent = true }), -1)
         TriggerClientEvent("guille_doorlock:client:removeGlobDoor", -1, id)
     end
 end)
@@ -117,3 +128,14 @@ RegisterCommand("deletedoor", function(source, args)
         TriggerClientEvent("guille_doorlock:client:deleteDoor", _src)
     end 
 end, false)
+
+QBCore['Functions']['CreateCallback']('guille_doorlock:cb:hasObj', function(source,cb, item) 
+    local _src = source
+    local xPlayer = QBCore['Functions']['GetPlayer'](_src)
+    local itemPly = xPlayer['Functions']['GetItemByName'](item)
+    if itemPly ~= nil then
+        return cb(true)
+    else 
+        return cb(false)
+    end
+end)

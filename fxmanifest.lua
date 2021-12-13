@@ -2,9 +2,7 @@ fx_version 'cerulean'
 
 game 'gta5'
 
-author 'guillerp#1928'
-
-description 'guille_doorlock converted to QBCore by CherryozZ#5357'
+author 'guillerp#1928, CherryozZ#5357 just the QBCore version'
 
 lua54 'yes'
 
